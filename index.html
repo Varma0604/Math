@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Math Adventure for Kids</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            background-color: #add8e6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            animation: backgroundAnimation 15s infinite alternate;
+        }
+        @keyframes backgroundAnimation {
+            0% { background-color: #add8e6; }
+            100% { background-color: #87ceeb; }
+        }
+        .container {
+            background-color: #ffffff;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+            max-width: 800px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            color: #4a90e2;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        .game-area {
+            margin-top: 20px;
+            transition: transform 0.3s;
+        }
+        #problem {
+            font-size: 28px;
+            margin-bottom: 20px;
+            color: #333;
+            font-weight: bold;
+        }
+        #answer {
+            font-size: 20px;
+            padding: 10px;
+            width: 120px;
+            text-align: center;
+            border: 2px solid #4caf50;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        button {
+            background-color: #4caf50;
+            border: none;
+            color: white;
+            padding: 10px 20px;
+            font-size: 18px;
+            margin: 4px 2px;
+            cursor: pointer;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        #feedback {
+            margin-top: 20px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+        #progress {
+            margin-top: 20px;
+            width: 100%;
+            background-color: #ddd;
+            border-radius: 10px;
+        }
+        #progress-bar {
+            width: 0;
+            height: 30px;
+            background-color: #4caf50;
+            border-radius: 10px;
+            text-align: center;
+            line-height: 30px;
+            color: white;
+        }
+        #avatar {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+        #leaderboard {
+            margin-top: 30px;
+            width: 100%;
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .leaderboard-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Math Adventure for Kids</h1>
+        <div id="avatar">😃</div>
+        <div class="game-area">
+            <div id="problem"></div>
+            <input type="number" id="answer" placeholder="Your answer">
+            <button onclick="checkAnswer()">Submit</button>
+            <div id="feedback"></div>
+        </div>
+        <div id="progress">
+            <div id="progress-bar">0%</div>
+        </div>
+        <div id="leaderboard">
+            <h3>Leaderboard</h3>
+            <div class="leaderboard-item"><span>Player 1:</span> <span id="player1-score">0</span></div>
+            <div class="leaderboard-item"><span>Player 2:</span> <span id="player2-score">0</span></div>
+        </div>
+    </div>
+
+    <script>
+        let score = 0;
+        let totalQuestions = 0;
+        let currentProblem = {};
+        const playerScores = [0, 0];
+
+        function generateProblem() {
+            const operations = ['+', '-', '*'];
+            const operation = operations[Math.floor(Math.random() * operations.length)];
+            let num1, num2;
+
+            switch(operation) {
+                case '+':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * 20) + 1;
+                    break;
+                case '-':
+                    num1 = Math.floor(Math.random() * 20) + 1;
+                    num2 = Math.floor(Math.random() * num1) + 1;
+                    break;
+                case '*':
+                    num1 = Math.floor(Math.random() * 10) + 1;
+                    num2 = Math.floor(Math.random() * 10) + 1;
+                    break;
+            }
+
+            currentProblem = {
+                question: `${num1} ${operation} ${num2} = ?`,
+                answer: eval(`${num1} ${operation} ${num2}`)
+            };
+
+            document.getElementById('problem').textContent = currentProblem.question;
+            document.getElementById('answer').value = '';
+            document.getElementById('feedback').textContent = '';
+            document.getElementById('answer').focus();
+        }
+
+        function checkAnswer() {
+            const userAnswer = parseInt(document.getElementById('answer').value);
+            const feedback = document.getElementById('feedback');
+            
+            if (userAnswer === currentProblem.answer) {
+                feedback.textContent = "Correct! Great job! 🎉";
+                feedback.style.color = "green";
+                score++;
+                playerScores[0]++;
+                updateAvatar();
+            } else {
+                feedback.textContent = `Oops! The correct answer is ${currentProblem.answer}. Try again! 💪`;
+                feedback.style.color = "red";
+            }
+
+            totalQuestions++;
+            updateProgress();
+            updateLeaderboard();
+            setTimeout(generateProblem, 2000);
+        }
+
+        function updateProgress() {
+            const progressPercent = (score / totalQuestions) * 100;
+            const progressBar = document.getElementById('progress-bar');
+            progressBar.style.width = `${progressPercent}%`;
+            progressBar.textContent = `${Math.round(progressPercent)}%`;
+        }
+
+        function updateAvatar() {
+            const avatar = document.getElementById('avatar');
+            const avatars = ['😃', '😄', '😁', '🤠', '🦸‍♂️', '🧙‍♂️'];
+            avatar.textContent = avatars[Math.min(score, avatars.length - 1)];
+        }
+
+        function updateLeaderboard() {
+            document.getElementById('player1-score').textContent = playerScores[0];
+            document.getElementById('player2-score').textContent = playerScores[1];
+        }
+
+        generateProblem();
+    </script>
+</body>
+</html>
